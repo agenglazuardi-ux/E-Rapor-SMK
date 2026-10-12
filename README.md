@@ -122,3 +122,7 @@ routes/web.php                                 daftar route
 
 ## Tabel Database
 `users`, `tahun_ajarans`, `jurusans`, `gurus`, `kelas`, `siswas`, `mapels`, `pengajars`, `nilais`, `rapor_siswas` (absensi + catatan wali), `riwayat_kelas` (kelas & wali per semester), serta tabel bawaan Laravel (`sessions`, `cache`, `jobs`).
+
+
+## BEST REGARDS
+## MUHAMMAD AGENG LAZUARDI
