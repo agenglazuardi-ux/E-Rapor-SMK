@@ -64,13 +64,18 @@ class SiswaController extends Controller
             }
             $siswa->user->update($userData);
         });
-        RiwayatKelas::sinkron([$siswa->fresh()]);
+        $siswa = $siswa->fresh('kelas');
+        RiwayatKelas::sinkron([$siswa]);
+        $kelas = $siswa->kelas?->nama ?? ucfirst($siswa->status);
 
-        return redirect()->route('admin.siswa.index')->with('success', 'Data siswa diperbarui.');
+        return redirect()->route('admin.siswa.index')->with('success', "Data siswa diperbarui, {$siswa->nama} ({$kelas}).");
     }
 
     public function destroy(Siswa $siswa)
     {
+        if (\App\Models\Nilai::terisi()->where('siswa_id', $siswa->id)->exists() || \App\Models\RaporSiswa::terisi()->where('siswa_id', $siswa->id)->exists()) {
+            return back()->with('error', "Siswa {$siswa->nama} sudah memiliki nilai/absensi. Menghapusnya akan menghapus rapor yang pernah dibuat. Ubah status menjadi Pindah/Lulus lewat menu Edit sebagai gantinya.");
+        }
         $siswa->user->delete();
 
         return back()->with('success', 'Siswa dihapus.');

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EkskulController;
 use App\Http\Controllers\NilaiController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\RaporController;
@@ -35,12 +36,18 @@ Route::middleware('auth')->group(function () {
         Route::post('kenaikan-kelas', [Admin\KenaikanController::class, 'proses'])->name('kenaikan.proses');
         Route::resource('mapel', Admin\MapelController::class)->except('show');
         Route::resource('pengajar', Admin\PengajarController::class)->except('show');
+        Route::resource('ekstrakurikuler', Admin\EkstrakurikulerController::class)->except('show')->parameters(['ekstrakurikuler' => 'ekstrakurikuler']);
     });
 
     Route::middleware('role:guru')->group(function () {
         Route::get('/nilai', [NilaiController::class, 'index'])->name('nilai.index');
         Route::get('/nilai/{pengajar}', [NilaiController::class, 'edit'])->name('nilai.edit');
         Route::post('/nilai/{pengajar}', [NilaiController::class, 'update'])->name('nilai.update');
+
+        Route::get('/ekskul', [EkskulController::class, 'index'])->name('ekskul.index');
+        Route::get('/ekskul/{ekstrakurikuler}', [EkskulController::class, 'edit'])->name('ekskul.edit');
+        Route::put('/ekskul/{ekstrakurikuler}', [EkskulController::class, 'update'])->name('ekskul.update');
+        Route::post('/ekskul/{ekstrakurikuler}/tambah', [EkskulController::class, 'tambah'])->name('ekskul.tambah');
     });
 
     Route::middleware('role:admin,guru')->group(function () {

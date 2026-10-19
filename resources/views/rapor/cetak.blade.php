@@ -22,7 +22,14 @@
         .ttd .space { height: 64px; } .ttd .nama { font-weight: bold; text-decoration: underline; }
         .toolbar { text-align: center; margin: 16px; font-family: sans-serif; }
         .toolbar button { background: #0f3d2e; color: #fff; border: 0; padding: 10px 22px; border-radius: 8px; font-size: 14px; cursor: pointer; }
-        @media print { body { background: #fff; } .sheet { margin: 0; padding: 0; width: auto; min-height: auto; } .toolbar { display: none; } }
+        @media print {
+            body { background: #fff; } .sheet { margin: 0; padding: 0; width: auto; min-height: auto; } .toolbar { display: none; }
+            /* Jaga agar baris, tabel kecil, dan tanda tangan tidak terpotong di tengah halaman. */
+            .rapor-table thead { display: table-header-group; }
+            .rapor-table tr, .rapor-grid, .ttd-blok, .identitas tr { break-inside: avoid; page-break-inside: avoid; }
+            .rapor-table .kelompok { break-after: avoid; page-break-after: avoid; }
+            .rapor-table[data-testid="rapor-ekskul-table"] { break-inside: avoid; page-break-inside: avoid; }
+        }
     </style>
 </head>
 <body>
@@ -48,6 +55,7 @@
 
     @include('rapor._body')
 
+    <div class="ttd-blok">
     <div class="ttd">
         <div>Mengetahui,<br>Orang Tua/Wali<div class="space"></div><div class="nama">{{ $siswa->nama_ortu ?? '..............................' }}</div></div>
         <div></div>
@@ -56,6 +64,7 @@
     </div>
     <div class="ttd" style="grid-template-columns:1fr">
         <div>Mengetahui,<br>Kepala Sekolah<div class="space"></div><div class="nama">{{ $ta->kepala_sekolah ?? '..............................' }}</div><div>NIP. {{ $ta->nip_kepsek ?? '-' }}</div></div>
+    </div>
     </div>
 </div>
 </body>

@@ -49,10 +49,12 @@ class RiwayatKelas extends Model
             return;
         }
         $ids = $siswas->pluck('id');
-        $pairs = Nilai::whereIn('siswa_id', $ids)->select('siswa_id', 'tahun_ajaran_id')->distinct()->get()
-            ->concat(RaporSiswa::whereIn('siswa_id', $ids)->select('siswa_id', 'tahun_ajaran_id')->get())
+        // toBase(): hasil get() adalah Eloquent Collection; diff() miliknya mengharuskan isi berupa Model,
+        // sedangkan di sini isinya string "siswa-tahun". Ubah ke Collection biasa agar tidak error.
+        $pairs = Nilai::whereIn('siswa_id', $ids)->select('siswa_id', 'tahun_ajaran_id')->distinct()->get()->toBase()
+            ->concat(RaporSiswa::whereIn('siswa_id', $ids)->select('siswa_id', 'tahun_ajaran_id')->get()->toBase())
             ->map(fn ($r) => $r->siswa_id.'-'.$r->tahun_ajaran_id)->unique();
-        $ada = static::whereIn('siswa_id', $ids)->get()->map(fn ($r) => $r->siswa_id.'-'.$r->tahun_ajaran_id);
+        $ada = static::whereIn('siswa_id', $ids)->get()->toBase()->map(fn ($r) => $r->siswa_id.'-'.$r->tahun_ajaran_id);
         $byId = $siswas->keyBy('id');
         foreach ($pairs->diff($ada) as $pair) {
             [$siswaId, $taId] = explode('-', $pair);

@@ -49,7 +49,7 @@ Buka http://127.0.0.1:8000
 |---|---|---|
 | Admin | `admin` | `admin123` |
 | Guru (Wali X TKJ 1) | `198501012010011001` | `guru123` |
-| Guru (Wali X RPL 1) | `198703152011012002` | `guru123` |
+| Guru (Wali X RPL 1) | `  ` | `guru123` |
 | Guru | `199002202015031003` | `guru123` |
 | Siswa | `2025001` s/d `2025005` | `siswa123` |
 

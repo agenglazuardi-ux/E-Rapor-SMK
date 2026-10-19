@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Masuk · E-Rapor {{ config('erapor.sekolah.nama') }}</title>
+    <link rel="icon" href="{{ asset('logo.png') }}" type="image/png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,8 +15,7 @@
     <div class="login-art">
         <div class="d-flex align-items-center gap-3">
             <img src="{{ asset('logo.png') }}" alt="Logo {{ config('erapor.sekolah.nama') }}" class="brand-mark" style="width:auto;max-width:48px;height:48px;background:transparent;border-radius:0;object-fit:contain;flex-shrink:0;">
-           
-            <div><div class="brand-title">E-Rapor SMK</div><div class="brand-sub">{{ config('erapor.sekolah.nama') }}</div></div>
+           <div><div class="brand-title">E-Rapor SMK</div><div class="brand-sub">{{ config('erapor.sekolah.nama') }}</div></div>
         </div>
         <div style="position:relative">
             <span class="eyebrow" style="color:#9fb5a9">Kurikulum Merdeka</span>
@@ -27,7 +27,7 @@
     <div class="login-form">
         <div class="login-card">
             <h2 class="fw-bold" style="color:var(--forest)">Masuk</h2>
-            <p class="text-muted mb-4">Gunakan NIP (guru), NIS (siswa), atau username admin.</p>
+            <!-- <p class="text-muted mb-4">Gunakan NIP (guru), NIS (siswa), atau username admin.</p> -->
             @include('partials.alerts')
             <form method="POST" action="{{ route('login.post') }}" data-testid="login-form">
                 @csrf

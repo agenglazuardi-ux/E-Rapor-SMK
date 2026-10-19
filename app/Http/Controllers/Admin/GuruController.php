@@ -62,6 +62,14 @@ class GuruController extends Controller
 
     public function destroy(Guru $guru)
     {
+        if ($guru->kelasWali()->exists()) {
+            $daftar = $guru->kelasWali()->pluck('nama')->join(', ');
+            return back()->with('error', "Guru {$guru->nama} masih menjadi wali kelas {$daftar}. Ganti wali kelasnya terlebih dahulu di menu Kelas & Wali.");
+        }
+        if ($guru->ekstrakurikulers()->exists()) {
+            $daftar = $guru->ekstrakurikulers()->pluck('nama')->join(', ');
+            return back()->with('error', "Guru {$guru->nama} masih menjadi pembina ekstrakurikuler {$daftar}. Ganti pembinanya terlebih dahulu di menu Ekstrakurikuler.");
+        }
         $guru->user->delete();
 
         return back()->with('success', 'Guru dihapus.');

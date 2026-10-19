@@ -41,6 +41,9 @@ class MapelController extends Controller
 
     public function destroy(Mapel $mapel)
     {
+        if (\App\Models\Nilai::terisi()->where('mapel_id', $mapel->id)->exists()) {
+            return back()->with('error', "Mata pelajaran {$mapel->nama} sudah memiliki nilai siswa. Menghapusnya akan menghapus semua nilai tersebut, jadi penghapusan ditolak.");
+        }
         $mapel->delete();
 
         return back()->with('success', 'Mata pelajaran dihapus.');

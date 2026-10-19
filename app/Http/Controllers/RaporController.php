@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EkstrakurikulerSiswa;
 use App\Models\Nilai;
 use App\Models\RaporSiswa;
 use App\Models\RiwayatKelas;
@@ -55,9 +56,11 @@ class RaporController extends Controller
             ->groupBy(fn ($n) => $n->mapel->kelompok)
             ->sortBy(fn ($g, $k) => array_search($k, ['Umum', 'Kejuruan', 'Muatan Lokal']));
         $rapor = RaporSiswa::firstOrNew(['siswa_id' => $siswa->id, 'tahun_ajaran_id' => $ta->id]);
+        $ekskul = EkstrakurikulerSiswa::with('ekstrakurikuler')->where('siswa_id', $siswa->id)->where('tahun_ajaran_id', $ta->id)->get()
+            ->sortBy(fn ($e) => $e->ekstrakurikuler->nama)->values();
         $info = $this->info($siswa, $ta);
 
-        return compact('siswa', 'ta', 'nilais', 'rapor', 'info');
+        return compact('siswa', 'ta', 'nilais', 'rapor', 'info', 'ekskul');
     }
 
     // Kelas & wali kelas siswa pada semester tersebut (dari riwayat), fallback ke kelas saat ini.

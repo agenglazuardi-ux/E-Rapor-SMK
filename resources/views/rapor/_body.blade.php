@@ -21,6 +21,21 @@
     </tbody>
 </table>
 
+<table class="rapor-table" data-testid="rapor-ekskul-table">
+    <thead><tr><th style="width:5%">No</th><th style="width:35%">Kegiatan Ekstrakurikuler</th><th>Keterangan</th></tr></thead>
+    <tbody>
+    @forelse($ekskul as $i => $e)
+        <tr>
+            <td class="c">{{ $i + 1 }}</td>
+            <td>{{ $e->ekstrakurikuler->nama }}</td>
+            <td class="desc">{{ $e->keterangan ?? '-' }}</td>
+        </tr>
+    @empty
+        <tr><td colspan="3" class="c">Belum ada data ekstrakurikuler untuk semester ini.</td></tr>
+    @endforelse
+    </tbody>
+</table>
+
 <div class="rapor-grid">
     <table class="rapor-table">
         <thead><tr><th colspan="2">Ketidakhadiran</th></tr></thead>

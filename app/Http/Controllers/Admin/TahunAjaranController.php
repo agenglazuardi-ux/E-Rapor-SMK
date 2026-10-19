@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\EkstrakurikulerSiswa;
+use App\Models\Nilai;
+use App\Models\RaporSiswa;
 use App\Models\RiwayatKelas;
 use App\Models\Siswa;
 use App\Models\TahunAjaran;
@@ -20,7 +23,14 @@ class TahunAjaranController extends Controller
 
     public function create()
     {
-        return view('admin.tahun_ajaran.form', ['item' => new TahunAjaran]);
+        // Data kepala sekolah biasanya sama dengan semester sebelumnya; tanggal rapor sengaja tidak disalin.
+        $terakhir = TahunAjaran::latest('id')->first();
+        $item = new TahunAjaran([
+            'kepala_sekolah' => $terakhir?->kepala_sekolah,
+            'nip_kepsek' => $terakhir?->nip_kepsek,
+        ]);
+
+        return view('admin.tahun_ajaran.form', ['item' => $item]);
     }
 
     public function store(Request $request)
@@ -44,6 +54,16 @@ class TahunAjaranController extends Controller
 
     public function destroy(TahunAjaran $tahunAjaran)
     {
+        if ($tahunAjaran->aktif) {
+            return back()->with('error', "Tahun ajaran {$tahunAjaran->label} sedang aktif dan tidak dapat dihapus. Aktifkan tahun ajaran lain terlebih dahulu.");
+        }
+        $adaData = Nilai::terisi()->where('tahun_ajaran_id', $tahunAjaran->id)->exists()
+            || RaporSiswa::terisi()->where('tahun_ajaran_id', $tahunAjaran->id)->exists()
+            || RiwayatKelas::where('tahun_ajaran_id', $tahunAjaran->id)->exists()
+            || EkstrakurikulerSiswa::where('tahun_ajaran_id', $tahunAjaran->id)->exists();
+        if ($adaData) {
+            return back()->with('error', "Tahun ajaran {$tahunAjaran->label} sudah berisi nilai/absensi/riwayat kelas/data ekstrakurikuler. Menghapusnya akan ikut menghapus semua data tersebut, jadi penghapusan ditolak.");
+        }
         $tahunAjaran->delete();
 
         return back()->with('success', 'Tahun ajaran dihapus.');

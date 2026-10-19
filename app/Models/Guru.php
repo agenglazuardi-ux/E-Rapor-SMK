@@ -20,6 +20,11 @@ class Guru extends Model
         return $this->hasMany(Pengajar::class);
     }
 
+    public function ekstrakurikulers()
+    {
+        return $this->hasMany(Ekstrakurikuler::class);
+    }
+
     public function kelasWali()
     {
         return $this->hasMany(Kelas::class, 'wali_kelas_id');

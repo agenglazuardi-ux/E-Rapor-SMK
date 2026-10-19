@@ -50,11 +50,12 @@
                 <select name="tujuan" class="form-select" required data-testid="kenaikan-tujuan-select" onchange="document.getElementById('salin-wrap').style.display = this.value === 'lulus' ? 'none' : ''">
                     <option value="">- Pilih -</option>
                     @if($asal->tingkat === 'XII')<option value="lulus">LULUS (Alumni)</option>@endif
-                    @foreach($kelasList->where('id', '!=', $asal->id) as $k)<option value="{{ $k->id }}">{{ $k->nama }} · {{ $k->jurusan->kode }} · Wali: {{ $k->waliKelas?->nama ?? '-' }}</option>@endforeach
+                    @php($tingkatTujuan = ['X' => 'XI', 'XI' => 'XII'][$asal->tingkat] ?? null)
+                    @foreach($kelasList->where('id', '!=', $asal->id)->where('tingkat', $tingkatTujuan) as $k)<option value="{{ $k->id }}">{{ $k->nama }} · {{ $k->jurusan->kode }} · Wali: {{ $k->waliKelas?->nama ?? '-' }}</option>@endforeach
                 </select>
-                <small class="text-muted">Kelas tujuan belum ada? Buat dulu di menu <a href="{{ route('admin.kelas.create') }}">Kelas & Wali</a>.</small>
+                <small class="text-muted">@if($tingkatTujuan)Hanya kelas tingkat {{ $tingkatTujuan }} yang ditampilkan. @endif Kelas tujuan belum ada? Buat dulu di menu <a href="{{ route('admin.kelas.create') }}">Kelas & Wali</a>.</small>
             </div>
-            <div class="col-md-7" id="salin-wrap">
+            <div class="col-md-7" id="salin-wrap" @if($asal->tingkat === 'XII') style="display:none" @endif>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="salin_pengajar" value="1" id="salin" data-testid="kenaikan-salin-pengajar-checkbox">
                     <label class="form-check-label" for="salin">Salin penugasan guru pengajar dari {{ $asal->nama }} ({{ $asal->pengajars->count() }} mapel) ke kelas tujuan. Mapel yang sudah punya guru di kelas tujuan tidak diubah.</label>

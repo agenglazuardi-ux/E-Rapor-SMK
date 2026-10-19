@@ -44,6 +44,9 @@ class KelasController extends Controller
 
     public function destroy(Kelas $kelas)
     {
+        if ($kelas->siswas()->exists()) {
+            return back()->with('error', "Kelas {$kelas->nama} masih memiliki siswa. Pindahkan siswa (Kenaikan Kelas / Edit Siswa) terlebih dahulu.");
+        }
         $kelas->delete();
 
         return back()->with('success', 'Kelas dihapus.');

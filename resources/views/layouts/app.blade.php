@@ -9,6 +9,21 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="{{ asset('css/erapor.css') }}" rel="stylesheet">
+    <script>
+        // Pulihkan status sidebar (desktop) sebelum halaman tampil agar tidak berkedip.
+        try { if (localStorage.getItem('erapor.sidebar') === 'closed') document.documentElement.classList.add('sidebar-collapsed'); } catch (e) {}
+    </script>
+    <style>
+        .main { transition: margin-left .25s ease; }
+        .sidebar-backdrop { display: none; }
+        @media (min-width: 992px) {
+            html.sidebar-collapsed .sidebar { transform: translateX(-100%); visibility: hidden; transition: transform .25s ease, visibility 0s linear .25s; }
+            html.sidebar-collapsed .main { margin-left: 0; }
+        }
+        @media (max-width: 991px) {
+            .sidebar.open ~ .sidebar-backdrop { display: block; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 25; }
+        }
+    </style>
 </head>
 <body>
 @php($u = auth()->user())
@@ -32,6 +47,7 @@
                 <a href="{{ route('admin.siswa.index') }}" class="{{ request()->routeIs('admin.siswa.*') && ! request()->routeIs('admin.siswa.import*') ? 'active' : '' }}" data-testid="nav-siswa"><i class="bi bi-people"></i> Siswa</a>
                 <a href="{{ route('admin.mapel.index') }}" class="{{ request()->routeIs('admin.mapel.*') ? 'active' : '' }}" data-testid="nav-mapel"><i class="bi bi-journal-bookmark"></i> Mata Pelajaran</a>
                 <a href="{{ route('admin.pengajar.index') }}" class="{{ request()->routeIs('admin.pengajar.*') ? 'active' : '' }}" data-testid="nav-pengajar"><i class="bi bi-easel"></i> Guru Pengajar</a>
+                <a href="{{ route('admin.ekstrakurikuler.index') }}" class="{{ request()->routeIs('admin.ekstrakurikuler.*') ? 'active' : '' }}" data-testid="nav-ekstrakurikuler"><i class="bi bi-trophy"></i> Ekstrakurikuler</a>
                 <a href="{{ route('admin.siswa.import.form') }}" class="{{ request()->routeIs('admin.siswa.import*') ? 'active' : '' }}" data-testid="nav-import-siswa"><i class="bi bi-file-earmark-excel"></i> Import Siswa (Excel)</a>
                 <a href="{{ route('admin.kenaikan.index') }}" class="{{ request()->routeIs('admin.kenaikan.*') ? 'active' : '' }}" data-testid="nav-kenaikan"><i class="bi bi-arrow-up-circle"></i> Kenaikan Kelas</a>
                 <div class="nav-label">Rapor</div>
@@ -41,6 +57,10 @@
                 <a href="{{ route('nilai.index') }}" class="{{ request()->routeIs('nilai.*') ? 'active' : '' }}" data-testid="nav-input-nilai"><i class="bi bi-pencil-square"></i> Input Nilai</a>
                 <div class="nav-label">Wali Kelas</div>
                 <a href="{{ route('wali.index') }}" class="{{ request()->routeIs('wali.*') ? 'active' : '' }}" data-testid="nav-wali-kelas"><i class="bi bi-person-workspace"></i> Kelas Perwalian</a>
+                @if($u->guru?->ekstrakurikulers()->exists())
+                    <div class="nav-label">Ekstrakurikuler</div>
+                    <a href="{{ route('ekskul.index') }}" class="{{ request()->routeIs('ekskul.*') ? 'active' : '' }}" data-testid="nav-ekskul"><i class="bi bi-trophy"></i> Kegiatan Ekskul</a>
+                @endif
             @else
                 <div class="nav-label">Akademik</div>
                 <a href="{{ route('rapor.saya') }}" class="{{ request()->routeIs('rapor.saya') ? 'active' : '' }}" data-testid="nav-rapor-saya"><i class="bi bi-file-earmark-text"></i> Rapor Saya</a>
@@ -49,9 +69,10 @@
             <a href="{{ route('profil.password') }}" class="{{ request()->routeIs('profil.*') ? 'active' : '' }}" data-testid="nav-ganti-password"><i class="bi bi-key"></i> Ganti Password</a>
         </nav>
     </aside>
+    <div class="sidebar-backdrop" onclick="document.getElementById('sidebar').classList.remove('open')"></div>
     <main class="main">
         <header class="topbar">
-            <button class="btn btn-sm btn-light d-lg-none" onclick="document.getElementById('sidebar').classList.toggle('open')" data-testid="toggle-sidebar"><i class="bi bi-list"></i></button>
+            <button type="button" class="btn btn-sm btn-light" onclick="toggleSidebar()" title="Buka/tutup menu" aria-label="Buka/tutup menu" data-testid="toggle-sidebar"><i class="bi bi-list"></i></button>
             <div class="page-heading">
                 <span class="eyebrow">@yield('eyebrow', 'Sistem Informasi Akademik')</span>
                 <h1>@yield('title', 'Dashboard')</h1>
@@ -73,6 +94,16 @@
     </main>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleSidebar() {
+        if (window.matchMedia('(min-width: 992px)').matches) {
+            var tertutup = document.documentElement.classList.toggle('sidebar-collapsed');
+            try { localStorage.setItem('erapor.sidebar', tertutup ? 'closed' : 'open'); } catch (e) {}
+        } else {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+    }
+</script>
 @stack('scripts')
 </body>
 </html>

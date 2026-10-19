@@ -94,9 +94,20 @@ class WaliKelasController extends Controller
         });
 
         $ranked = $rows->sortByDesc('jumlah')->values();
+        // Jumlah nilai sama = peringkat sama (1, 2, 2, 4).
         $rank = [];
+        $jumlahSebelum = null;
+        $rankSebelum = 0;
         foreach ($ranked as $i => $r) {
-            $rank[$r['siswa']->id] = $r['jumlah'] > 0 ? $i + 1 : '-';
+            if ($r['jumlah'] <= 0) {
+                $rank[$r['siswa']->id] = '-';
+                continue;
+            }
+            if ($r['jumlah'] !== $jumlahSebelum) {
+                $rankSebelum = $i + 1;
+                $jumlahSebelum = $r['jumlah'];
+            }
+            $rank[$r['siswa']->id] = $rankSebelum;
         }
 
         $rataMapel = $mapels->mapWithKeys(fn ($m) => [$m->id => round($rows->map(fn ($r) => $r['nilai'][$m->id] ?? null)->filter(fn ($v) => $v !== null)->avg() ?? 0, 2)]);

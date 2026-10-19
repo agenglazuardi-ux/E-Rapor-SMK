@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -95,6 +96,16 @@ class SiswaExcel
             $data = ['nis' => $nis, 'nisn' => $nisn, 'nama' => $nama, 'jenis_kelamin' => $jk, 'kelas_id' => $kelasId,
                 'tempat_lahir' => $tempat ?: null, 'tanggal_lahir' => $tanggal, 'alamat' => $alamat ?: null, 'nama_ortu' => $ortu ?: null];
 
+            if ($ada) {
+                if ($ada->status !== 'aktif') {
+                    // Siswa lulus/pindah tidak boleh diberi kelas.
+                    $data['kelas_id'] = null;
+                } elseif ($kelasId === null) {
+                    // Kolom Kelas dikosongkan di Excel: pertahankan kelas yang sekarang.
+                    unset($data['kelas_id']);
+                }
+            }
+
             $siswa = DB::transaction(function () use ($ada, $data, $nis) {
                 if ($ada) {
                     RiwayatKelas::bekukan([$ada]);
@@ -165,6 +176,8 @@ class SiswaExcel
         foreach (range('A', $last) as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
+        // NIS & NISN diformat teks agar angka 0 di depan tidak hilang saat diketik/ditempel di Excel.
+        $sheet->getStyle('A2:B'.max(1000, count($rows) + 1))->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
         $sheet->freezePane('A2');
 
         return $book;

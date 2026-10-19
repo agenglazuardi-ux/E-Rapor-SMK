@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\DB;
 
 class KenaikanController extends Controller
 {
+    private const TINGKAT_BERIKUTNYA = ['X' => 'XI', 'XI' => 'XII'];
+
     public function index(Request $request)
     {
         $ta = TahunAjaran::aktif();
@@ -38,7 +40,20 @@ class KenaikanController extends Controller
 
         $asal = Kelas::with('pengajars')->findOrFail($data['kelas_asal']);
         $lulus = $data['tujuan'] === 'lulus';
-        $tujuan = $lulus ? null : Kelas::where('id', '!=', $asal->id)->findOrFail($data['tujuan']);
+        if ($lulus && $asal->tingkat !== 'XII') {
+            return back()->with('error', 'Kelulusan hanya untuk siswa kelas XII.');
+        }
+        $tujuan = null;
+        if (! $lulus) {
+            $tingkatTujuan = self::TINGKAT_BERIKUTNYA[$asal->tingkat] ?? null;
+            if (! $tingkatTujuan) {
+                return back()->with('error', 'Siswa kelas XII hanya dapat diluluskan, bukan dinaikkan ke kelas lain.');
+            }
+            $tujuan = Kelas::where('id', '!=', $asal->id)->findOrFail($data['tujuan']);
+            if ($tujuan->tingkat !== $tingkatTujuan) {
+                return back()->with('error', "Siswa kelas {$asal->tingkat} hanya dapat dinaikkan ke kelas tingkat {$tingkatTujuan}.");
+            }
+        }
         $siswas = $asal->siswas()->get();
         $naikIds = collect($data['naik'] ?? [])->map(fn ($v) => (int) $v)->intersect($siswas->pluck('id'));
 
