@@ -8,7 +8,10 @@
     .rapor-table th { background:var(--forest); color:#fff; font-weight:600; text-align:center; }
     .rapor-table .kelompok td { background:#f5f2ea; font-weight:700; }
     .rapor-table .c { text-align:center; } .rapor-table .merah { color:#b42318; }
-    .rapor-grid { display:grid; grid-template-columns:1fr 2fr; gap:16px; }
+    .rapor-sec { font-weight:700; margin:18px 0 8px; }
+    .rapor-box { border:1px solid var(--line); border-radius:8px; padding:10px 14px; margin-bottom:20px; }
+    .rapor-catatan { text-align:center; }
+    .rapor-absen { width:50%; } .rapor-absen td { text-align:left; }
 </style>
 <div class="panel">
     <div class="panel-head">
