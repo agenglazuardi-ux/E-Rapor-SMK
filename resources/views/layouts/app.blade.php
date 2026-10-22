@@ -65,6 +65,10 @@
                 <div class="nav-label">Akademik</div>
                 <a href="{{ route('rapor.saya') }}" class="{{ request()->routeIs('rapor.saya') ? 'active' : '' }}" data-testid="nav-rapor-saya"><i class="bi bi-file-earmark-text"></i> Rapor Saya</a>
             @endif
+            @if(in_array($u->role, ['admin', 'guru']))
+                <div class="nav-label">Komunikasi</div>
+                <a href="{{ route('chat.index') }}" class="{{ request()->routeIs('chat.*') ? 'active' : '' }}" data-testid="nav-chat"><i class="bi bi-chat-dots"></i> Pesan <span class="badge rounded-pill bg-danger ms-auto d-none" id="chat-badge" data-testid="chat-badge">0</span></a>
+            @endif
             <div class="nav-label">Akun</div>
             <a href="{{ route('profil.password') }}" class="{{ request()->routeIs('profil.*') ? 'active' : '' }}" data-testid="nav-ganti-password"><i class="bi bi-key"></i> Ganti Password</a>
         </nav>
@@ -104,6 +108,27 @@
         }
     }
 </script>
+@if(in_array($u->role, ['admin', 'guru']))
+<script>
+    // Badge pesan belum dibaca di menu (di halaman Pesan, badge diperbarui oleh halaman itu sendiri).
+    (function () {
+        function ambilBadge() {
+            if (window.__chatAktif || document.hidden) { return; }
+            fetch(@json(route('chat.belum')), { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (d) {
+                    var b = document.getElementById('chat-badge');
+                    if (!d || !b) { return; }
+                    b.textContent = d.jumlah > 99 ? '99+' : d.jumlah;
+                    b.classList.toggle('d-none', !d.jumlah);
+                })
+                .catch(function () {});
+        }
+        ambilBadge();
+        setInterval(ambilBadge, 15000);
+    })();
+</script>
+@endif
 @stack('scripts')
 </body>
 </html>

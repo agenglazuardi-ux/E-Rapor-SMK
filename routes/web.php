@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EkskulController;
 use App\Http\Controllers\NilaiController;
@@ -55,6 +56,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/wali-kelas/{kelas}/absensi', [WaliKelasController::class, 'absensi'])->name('wali.absensi');
         Route::post('/wali-kelas/{kelas}/absensi', [WaliKelasController::class, 'simpanAbsensi'])->name('wali.absensi.simpan');
         Route::get('/wali-kelas/{kelas}/rekap', [WaliKelasController::class, 'rekap'])->name('wali.rekap');
+
+        // Chat pribadi khusus admin & guru.
+        Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+        Route::get('/chat/kontak', [ChatController::class, 'kontak'])->name('chat.kontak');
+        Route::get('/chat/belum-dibaca', [ChatController::class, 'belumDibaca'])->name('chat.belum');
+        Route::get('/chat/{lawan}/pesan', [ChatController::class, 'pesan'])->name('chat.pesan');
+        Route::post('/chat/{lawan}/pesan', [ChatController::class, 'kirim'])->middleware('throttle:60,1')->name('chat.kirim');
     });
 
     Route::get('/rapor-saya', [RaporController::class, 'saya'])->middleware('role:siswa')->name('rapor.saya');
