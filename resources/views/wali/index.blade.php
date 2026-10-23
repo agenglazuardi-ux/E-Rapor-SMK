@@ -15,13 +15,13 @@
             @endif
         </div>
         <div class="table-responsive"><table class="table table-hover mb-0">
-            <thead><tr><th>NIS</th><th>Nama Siswa</th><th class="text-end">Rapor</th></tr></thead>
+            <thead><tr><th>NIS</th><th>NISN</th><th>Nama Siswa</th><th class="text-end">Rapor</th></tr></thead>
             <tbody>
             @forelse($k->siswas as $s)
-                <tr><td class="font-monospace small">{{ $s->nis }}</td><td>{{ $s->nama }}</td>
+                <tr><td class="font-monospace small">{{ $s->nis }}</td><td class="font-monospace small">{{ $s->nisn ?? '-' }}</td><td>{{ $s->nama }}</td>
                     <td class="text-end">@if($ta)<a href="{{ route('rapor.cetak', $s) }}" target="_blank" class="btn btn-sm btn-outline-secondary" data-testid="cetak-rapor-btn-{{ $s->id }}"><i class="bi bi-printer me-1"></i>Cetak</a>@endif</td></tr>
             @empty
-                <tr><td colspan="3" class="text-muted text-center">Belum ada siswa.</td></tr>
+                <tr><td colspan="4" class="text-muted text-center">Belum ada siswa.</td></tr>
             @endforelse
             </tbody>
         </table></div>

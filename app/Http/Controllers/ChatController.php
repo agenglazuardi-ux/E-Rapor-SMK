@@ -83,8 +83,9 @@ class ChatController extends Controller
             return response()->json(['pesan' => [], 'ada_lama' => false, 'terbaca_sampai' => 0]);
         }
 
-        $q = ChatPesan::where('percakapan_id', $p->id);
+        $q = ChatPesan::query()->where('percakapan_id', $p->id);
         $adaLama = false;
+        /** @var \Illuminate\Support\Collection<int, ChatPesan> $pesan */
         if ($request->filled('setelah')) {
             $pesan = $q->where('id', '>', (int) $request->query('setelah'))->orderBy('id')->limit(200)->get();
         } else {

@@ -23,6 +23,16 @@
         </ol>
     </div>
 @elseif(auth()->user()->role === 'guru')
+    {{-- Pengingat wali kelas: catatan wali kelas semester aktif yang belum diisi --}}
+    @foreach($kelasWali as $k)
+        @if(($k->catatan_belum ?? 0) > 0)
+            <div class="alert alert-warning d-flex align-items-center gap-3" data-testid="pengingat-catatan-{{ $k->id }}">
+                <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                <div class="flex-grow-1"><b>{{ $k->catatan_belum }} dari {{ $k->siswas_count }} siswa</b> di kelas <b>{{ $k->nama }}</b> belum ada catatan wali kelas (TA {{ $ta->label }}).</div>
+                <a href="{{ route('wali.absensi', $k) }}" class="btn btn-sm btn-warning text-nowrap" data-testid="pengingat-isi-{{ $k->id }}">Isi Sekarang</a>
+            </div>
+        @endif
+    @endforeach
     <div class="row g-4">
         <div class="col-lg-7">
             <div class="panel h-100">
@@ -41,8 +51,11 @@
                 <div class="panel-head"><h2>Kelas Perwalian</h2></div>
                 @forelse($kelasWali as $k)
                     <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                        <div><b>{{ $k->nama }}</b><div class="small text-muted">{{ $k->siswas_count }} siswa</div></div>
-                        <a href="{{ route('wali.rekap', $k) }}" class="btn btn-sm btn-accent" data-testid="dashboard-rekap-{{ $k->id }}">Rekap</a>
+                        <div><b>{{ $k->nama }}</b><div class="small text-muted">{{ $k->siswas_count }} siswa @if($ta)· catatan terisi {{ $k->siswas_count - ($k->catatan_belum ?? 0) }}/{{ $k->siswas_count }}@endif</div></div>
+                        <div class="d-flex gap-2">
+                            <a href="{{ route('wali.absensi', $k) }}" class="btn btn-sm btn-light" data-testid="dashboard-absensi-{{ $k->id }}">Absensi & Catatan</a>
+                            <a href="{{ route('wali.rekap', $k) }}" class="btn btn-sm btn-accent" data-testid="dashboard-rekap-{{ $k->id }}">Rekap</a>
+                        </div>
                     </div>
                 @empty
                     <p class="text-muted mb-0">Anda bukan wali kelas.</p>

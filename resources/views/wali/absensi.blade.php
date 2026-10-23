@@ -12,7 +12,7 @@
             @foreach($siswas as $i => $s)
                 @php($r = $rapors[$s->id] ?? null)
                 <tr>
-                    <td>{{ $i + 1 }}</td><td><div class="fw-semibold">{{ $s->nama }}</div><small class="text-muted">{{ $s->nis }}</small></td>
+                    <td>{{ $i + 1 }}</td><td><div class="fw-semibold">{{ $s->nama }}</div><small class="text-muted">NIS {{ $s->nis }} · NISN {{ $s->nisn ?? '-' }}</small></td>
                     @foreach(['sakit', 'izin', 'alpa'] as $f)
                         <td><input type="number" min="0" name="data[{{ $s->id }}][{{ $f }}]" value="{{ $r?->$f ?? 0 }}" class="form-control nilai-input mx-auto" data-testid="{{ $f }}-input-{{ $s->id }}"></td>
                     @endforeach
