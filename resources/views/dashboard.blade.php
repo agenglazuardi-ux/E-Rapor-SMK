@@ -33,6 +33,15 @@
             </div>
         @endif
     @endforeach
+    @foreach($kelasWali as $k)
+        @if(($k->keputusan_belum ?? 0) > 0)
+            <div class="alert alert-warning d-flex align-items-center gap-3" data-testid="pengingat-keputusan-{{ $k->id }}">
+                <i class="bi bi-arrow-up-circle-fill fs-4"></i>
+                <div class="flex-grow-1"><b>{{ $k->keputusan_belum }} dari {{ $k->siswas_count }} siswa</b> di kelas <b>{{ $k->nama }}</b> belum ada keputusan kenaikan kelas (naik / tinggal / lulus). Rapor semester Genap masih menampilkan titik-titik.</div>
+                <a href="{{ route('wali.absensi', $k) }}" class="btn btn-sm btn-warning text-nowrap" data-testid="pengingat-keputusan-isi-{{ $k->id }}">Isi Keputusan</a>
+            </div>
+        @endif
+    @endforeach
     <div class="row g-4">
         <div class="col-lg-7">
             <div class="panel h-100">
@@ -51,7 +60,13 @@
                 <div class="panel-head"><h2>Kelas Perwalian</h2></div>
                 @forelse($kelasWali as $k)
                     <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                        <div><b>{{ $k->nama }}</b><div class="small text-muted">{{ $k->siswas_count }} siswa @if($ta)· catatan terisi {{ $k->siswas_count - ($k->catatan_belum ?? 0) }}/{{ $k->siswas_count }}@endif</div></div>
+                        <div><b>{{ $k->nama }}</b><div class="small text-muted">{{ $k->siswas_count }} siswa @if($ta)
+                            · catatan terisi {{ $k->siswas_count - ($k->catatan_belum ?? 0) }}/{{ $k->siswas_count }}
+                            @if($ta->semester === 'Genap')
+                                · keputusan terisi {{ $k->siswas_count - ($k->keputusan_belum ?? 0) }}/{{ $k->siswas_count }}
+                            @endif
+                        @endif
+                        </div></div>
                         <div class="d-flex gap-2">
                             <a href="{{ route('wali.absensi', $k) }}" class="btn btn-sm btn-light" data-testid="dashboard-absensi-{{ $k->id }}">Absensi & Catatan</a>
                             <a href="{{ route('wali.rekap', $k) }}" class="btn btn-sm btn-accent" data-testid="dashboard-rekap-{{ $k->id }}">Rekap</a>

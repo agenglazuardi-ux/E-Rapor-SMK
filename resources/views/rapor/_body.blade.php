@@ -1,8 +1,14 @@
 {{-- Variabel opsional $bagian: 'nilai' (hanya bagian A) | 'lain' (bagian B dst.) | tidak diisi = semua. --}}
-@php($bagian = $bagian ?? 'semua')
-@php($genap = $ta->semester === 'Genap')
+@php
+    $bagian = $bagian ?? 'semua';
+@endphp
+@php
+    $genap = $ta->semester === 'Genap';
+@endphp
 @if($bagian !== 'lain')
-@php($no = 0)
+@php
+    $no = 0;
+@endphp
 <div class="rapor-sec">A. Nilai Akademik</div>
 <table class="rapor-table" data-testid="rapor-nilai-table">
     <thead><tr><th style="width:5%">No</th><th style="width:28%">Mata Pelajaran</th><th style="width:10%">Nilai Akhir</th><th>Capaian Kompetensi</th></tr></thead>
@@ -55,7 +61,20 @@
 
 @if($genap)
 <div class="rapor-sec">D. Kenaikan Kelas</div>
-<div class="rapor-box">Berdasarkan hasil yang dicapai pada semester 1 dan 2, maka peserta didik dinyatakan ..............................................................</div>
+@php
+    $kp = $rapor->keputusan ?? null;
+@endphp
+<div class="rapor-box" data-testid="rapor-kenaikan">Berdasarkan hasil yang dicapai pada semester 1 dan 2, maka peserta didik dinyatakan
+    @if($kp === 'naik' && $rapor->kelas_tujuan)
+        <b>NAIK</b> ke kelas <b>{{ $rapor->kelas_tujuan }}</b>.
+    @elseif($kp === 'tinggal')
+        <b>TINGGAL</b> di kelas <b>{{ $rapor->kelas_tujuan ?: ($info['kelas_nama'] ?? '') }}</b>.
+    @elseif($kp === 'lulus')
+        <b>LULUS</b> dari {{ config('erapor.sekolah.nama') }}.
+    @else
+        ..............................................................
+    @endif
+</div>
 @endif
 
 <div class="rapor-sec">{{ $genap ? 'E' : 'D' }}. Catatan Wali Kelas</div>

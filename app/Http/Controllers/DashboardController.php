@@ -40,6 +40,15 @@ class DashboardController extends Controller
                 foreach ($data['kelasWali'] as $k) {
                     $k->catatan_belum = $siswas->where('kelas_id', $k->id)->filter(fn ($s) => ! $sudahIsi->has($s->id))->count();
                 }
+
+                // Pengingat semester Genap: keputusan kenaikan kelas (naik/tinggal/lulus) yang belum diisi.
+                if ($ta->semester === 'Genap') {
+                    $sudahPutus = RaporSiswa::where('tahun_ajaran_id', $ta->id)->whereIn('siswa_id', $siswas->pluck('id'))
+                        ->whereNotNull('keputusan')->pluck('siswa_id')->flip();
+                    foreach ($data['kelasWali'] as $k) {
+                        $k->keputusan_belum = $siswas->where('kelas_id', $k->id)->filter(fn ($s) => ! $sudahPutus->has($s->id))->count();
+                    }
+                }
             }
         } else {
             $siswa = $user->siswa()->with('kelas.waliKelas')->first();

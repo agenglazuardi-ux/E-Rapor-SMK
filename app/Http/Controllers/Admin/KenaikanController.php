@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Kelas;
 use App\Models\Nilai;
 use App\Models\Pengajar;
+use App\Models\RaporSiswa;
 use App\Models\RiwayatKelas;
 use App\Models\Siswa;
 use App\Models\TahunAjaran;
@@ -22,7 +23,23 @@ class KenaikanController extends Controller
         $kelasList = Kelas::with('jurusan', 'waliKelas')->withCount('siswas')->orderBy('tingkat')->orderBy('nama')->get();
         $asal = $request->kelas_asal ? Kelas::with('siswas', 'pengajars')->find($request->kelas_asal) : null;
 
-        return view('admin.kenaikan.index', compact('ta', 'kelasList', 'asal'));
+        // Keputusan wali kelas ada di rapor semester Genap sebelumnya; kenaikan diproses di Ganjil.
+        $keputusan = collect();
+        $taGenap = null;
+        $preTujuan = null;
+        $idByNama = $kelasList->pluck('id', 'nama');
+        if ($asal && $ta && $ta->semester === 'Ganjil') {
+            $taGenap = TahunAjaran::where('semester', 'Genap')->where('nama', '<', $ta->nama)->orderByDesc('nama')->first();
+            if ($taGenap) {
+                $keputusan = RaporSiswa::where('tahun_ajaran_id', $taGenap->id)->whereIn('siswa_id', $asal->siswas->pluck('id'))
+                    ->whereNotNull('keputusan')->get()->keyBy('siswa_id');
+            }
+            // Tujuan yang paling banyak dipilih wali kelas dijadikan pilihan awal.
+            $preTujuan = $keputusan->map(fn ($r) => $r->keputusan === 'lulus' ? 'lulus' : ($r->keputusan === 'naik' ? ($idByNama[$r->kelas_tujuan] ?? null) : null))
+                ->filter()->countBy()->sortDesc()->keys()->first();
+        }
+
+        return view('admin.kenaikan.index', compact('ta', 'kelasList', 'asal', 'keputusan', 'taGenap', 'preTujuan', 'idByNama'));
     }
 
     public function proses(Request $request)
