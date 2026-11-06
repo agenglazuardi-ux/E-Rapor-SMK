@@ -58,12 +58,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/wali-kelas/{kelas}/rekap', [WaliKelasController::class, 'rekap'])->name('wali.rekap');
 
         // Chat pribadi khusus admin & guru.
-        Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
-        Route::get('/chat/kontak', [ChatController::class, 'kontak'])->name('chat.kontak');
-        Route::get('/chat/belum-dibaca', [ChatController::class, 'belumDibaca'])->name('chat.belum');
-        Route::get('/chat/{lawan}/pesan', [ChatController::class, 'pesan'])->name('chat.pesan');
-        Route::post('/chat/{lawan}/pesan', [ChatController::class, 'kirim'])->middleware('throttle:60,1')->name('chat.kirim');
-    });
+                // Pesan pribadi khusus admin & guru.
+        Route::get('/pesan-pribadi', [ChatController::class, 'index'])->name('chat.index');
+        Route::get('/pesan-pribadi/kontak', [ChatController::class, 'kontak'])->name('chat.kontak');
+        Route::get('/pesan-pribadi/belum-dibaca', [ChatController::class, 'belumDibaca'])->name('chat.belum');
+        Route::get('/pesan-pribadi/{lawan}/pesan', [ChatController::class, 'pesan'])->name('chat.pesan');
+        Route::post('/pesan-pribadi/{lawan}/pesan', [ChatController::class, 'kirim'])->middleware('throttle:60,1')->name('chat.kirim');
+        });
 
     Route::get('/rapor-saya', [RaporController::class, 'saya'])->middleware('role:siswa')->name('rapor.saya');
     Route::get('/rapor/{siswa}/cetak', [RaporController::class, 'cetak'])->name('rapor.cetak');

@@ -67,7 +67,7 @@
 <script>
 (function () {
     var URL_KONTAK = @json(route('chat.kontak'));
-    var URL_CHAT = @json(url('/chat'));
+    var URL_CHAT = @json(url('/pesan-pribadi'));
     var CSRF = @json(csrf_token());
     var DENGAN_AWAL = {{ (int) $dengan }};
     window.__chatAktif = true;
